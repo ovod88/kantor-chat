@@ -31,7 +31,7 @@ server.on('listening', onListening);
 
 var emit = server.emit;
 server.emit = function(event) {
-  debug(event);
+  console.log(event);
   emit.apply(server, arguments);
 }
 
@@ -92,5 +92,5 @@ function onListening() {
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  console.log('Listening on ' + bind);
 }

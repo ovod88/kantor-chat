@@ -23,6 +23,31 @@ var app = express();
 // app.use(cookieParser());
 // app.use(express.static(path.join(__dirname, 'public')));
 
+
+//Default route if express does not find route 
+
+app.use(function(req, resp, next) {
+  if(req.url == '/forbidden') {
+    next(new Error('Forbidden url'));//If next is called with argument - express automatically detects an error 
+    //in request processing and call default error handler which can be overwritten. Throw also is transfered to this function
+  } else {
+    next();//Normal situation
+  }
+});
+
+app.use(function(req, resp) {//Default route handler
+  resp.status(404).send('No page for the provided url');
+});
+
+app.use(function(err, req, resp, next) {//Error handler
+
+  if(app.get('env') == 'development') {//This parameter can be changed via NODE_ENV. By default development
+    resp.status(500).send(err.stack);//Default express error handler
+  } else {
+    resp.status(500).send('Error occured');
+  }
+});
+
 // app.use('/', index);
 // app.use('/users', users);
 
