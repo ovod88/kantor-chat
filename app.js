@@ -1,5 +1,6 @@
 var express = require('express');
 var app = express();
+var logger = require('logger/log')(module);
 
 
 // var path = require('path');

@@ -15,7 +15,10 @@
             "type": "node",
             "request": "launch",
             "name": "Launch nodejs server development",
-            "program": "${workspaceRoot}/bin/www"
+            "program": "${workspaceRoot}/bin/www",
+            "env": {
+                "NODE_PATH": "../"
+            }
         },
         {
             "type": "node",
@@ -23,7 +26,8 @@
             "name": "Launch nodejs server production",
             "program": "${workspaceRoot}/bin/www",
             "env": {
-                "NODE_ENV": "production"
+                "NODE_ENV": "production",
+                "NODE_PATH": "../"
             }
         }
     ]
