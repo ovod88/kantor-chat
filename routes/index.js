@@ -1,9 +1,28 @@
-var express = require('express');
-var router = express.Router();
+  var User = require('db/models/user').User;
+  var HttpError = require('errors').HttpError;
+  var ObjectID = require('mongodb').ObjectID;
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+module.exports = function(app) {
+  app.get('/users', function(req, resp, next) {
+    User.find({}, function(err, users) {
+      if(err) next(500);
+      resp.json(users);
+    })
+  });
 
-module.exports = router;
+  app.get('/user/:id', function(req, resp, next) {
+    try {
+      var id = new ObjectID(req.params.id);
+    } catch (err) {
+      return next(404);
+    }
+
+    User.findById(id, function(err, user) {
+      if(err) return next(500);
+      if(!user) {
+        next(new HttpError(404, 'User not found'));
+      }
+      resp.json(user);
+    })
+  });
+}

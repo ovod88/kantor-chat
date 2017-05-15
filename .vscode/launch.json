@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [   
+
         {
             "type": "node",
             "request": "launch",
@@ -17,7 +18,7 @@
             "type": "node",
             "request": "attach",
             "name": "Attach to Process",
-            "processId": "${command:PickProcess}"
+            "port": 5858
         },
         {
             "type": "node",
@@ -25,7 +26,7 @@
             "name": "Launch nodejs server development",
             "program": "${workspaceRoot}/bin/www",
             "env": {
-                "NODE_PATH": "../"
+                "NODE_PATH": "${workspaceRoot}"
             }
         },
         {
@@ -35,7 +36,7 @@
             "program": "${workspaceRoot}/bin/www",
             "env": {
                 "NODE_ENV": "production",
-                "NODE_PATH": "../"
+                "NODE_PATH": "${workspaceRoot}"
             }
         }
     ]

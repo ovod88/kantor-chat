@@ -7,6 +7,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var config = require('config');
+var mongoose = require('mongoose');
+var session = require('express-session');
 
 // var index = require('./routes/index');
 // var users = require('./routes/users');
@@ -31,9 +34,31 @@ app.use(cookieParser());//parse cookies into req.cookies object if there are any
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+var MongoStore = require('connect-mongo')(session);
+
+app.use(session({
+  "secret": config.get('session:secret'),
+  "key": config.get('session:key'),
+  "cookie": {
+    "path": "/",
+    "httpOnly": true,
+    "maxAge": null
+  },
+  "store": new MongoStore({mongooseConnection: mongoose.connection})
+}));
+
+app.use(function(req, resp, next) {
+  req.session.visits = req.session.visits + 1 || 1;
+  resp.send('Number of visits: '+ req.session.visits );
+});
+
+app.use(require('middleware/sendHttpError'));
+
 app.get('/', function(req, resp) {
   resp.render('index');
 });
+
+require("routes")(app);
 
 //Default route if express does not find route 
 app.use(function(req, resp, next) {
@@ -49,34 +74,22 @@ app.use(function(req, resp) {//Default route handler
   resp.status(404).send('No page for the provided url');
 });
 
+var HttpError = require('errors').HttpError;
 app.use(function(err, req, resp, next) {//Error handler is called then error is thrown or next() is called this parameter
+  if(typeof err === 'number') {
+    err = new HttpError(err);
+  }
 
-  if(app.get('env') == 'development') {//This parameter can be changed via NODE_ENV. By default development
-    resp.status(500).send(err.stack);//Default express error handler
+  if(err instanceof HttpError) {
+    resp.sendHttpError(err);
   } else {
-    resp.status(500).send('Error occured');
+    if(app.get('env') == 'development') {//This parameter can be changed via NODE_ENV. By default development
+      resp.status(500).send(err.stack);//Default express error handler
+    } else {
+      err = new HttpError(500);
+      resp.sendHttpError(err);
+    }
   }
 });
-
-// app.use('/', index);
-// app.use('/users', users);
-
-// // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//   var err = new Error('Not Found');
-//   err.status = 404;
-//   next(err);
-// });
-
-// // error handler
-// app.use(function(err, req, res, next) {
-//   // set locals, only providing error in development
-//   res.locals.message = err.message;
-//   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-//   // render the error page
-//   res.status(err.status || 500);
-//   res.render('error');
-// });
 
 module.exports = app;

@@ -9,5 +9,9 @@
                 }
             }
         }
+    },
+    "session": {
+        "secret": "123456qwerty",
+        "key": "sidi"
     }
 }

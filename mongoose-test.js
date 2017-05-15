@@ -17,6 +17,6 @@ kitty.save(function (err) {
     console.log(err);
   } else {
     kitty.meow();
-    mongoose.connection.close();
+    mongoose.connection.close();//mongo-native-driver function
   }
 });
