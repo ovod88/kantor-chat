@@ -43,17 +43,18 @@
             url: '/login',
             method: 'POST',
             data: $form.serialize(),
-            complete: function() {
-                $(':submit', form).button('reset');
-            },
-            statusCode: {
-                200: function() {
+            complete: function(jqXHR) {
+                $(':submit', $form).button('reset');
+                if(jqXHR.status === 200) {
                     $form.html('You entered the site').addClass('alert-success');
                     window.location.href='/chat';
-                },
-                403: function(jqXHR) {
-                    var error = JSON.parse(jqXHR.responseText);
-                    $('.error', form).html(error.message);
+                } else if (jqXHR.status === 403 || jqXHR.status === 404) {
+                    if(typeof jqXHR.responseText === 'string')  {
+                        $('.error', $form).html(jqXHR.responseText);
+                    } else {
+                        var error = JSON.parse(jqXHR.responseText);
+                        $('.error', $form).html(error.message);
+                    }
                 }
             }
         });
