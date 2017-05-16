@@ -8,7 +8,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var config = require('config');
-var mongoose = require('mongoose');
+var mongoose = require('db/mongooseConnect');
 var session = require('express-session');
 
 // var index = require('./routes/index');
@@ -36,16 +36,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 var MongoStore = require('connect-mongo')(session);
 
-// app.use(session({
-//     "secret": config.get('session:secret'),
-//     "key": config.get('session:key'),
-//     "cookie": {
-//       "path": "/",
-//       "httpOnly": true,
-//       "maxAge": null
-//     },
-//     "store": new MongoStore({mongooseConnection: mongoose.connection})
-// }));
+app.use(session({//this creates collection called sessions to store user session
+    "secret": config.get('session:secret'),
+    "key": config.get('session:key'),
+    "cookie": {
+      "path": "/",
+      "httpOnly": true,
+      "maxAge": null
+    },
+    "store": new MongoStore({mongooseConnection: mongoose.connection})
+}));
 
 
 // app.use(function(req, resp, next) {
@@ -53,7 +53,7 @@ var MongoStore = require('connect-mongo')(session);
 //   resp.send('Number of visits: '+ req.session.visits );
 // });
 
-app.use(require('middleware/sendHttpError'));
+app.use(require('middleware/sendHttpError'));//creates method to send beautiful http error method
 
 // app.get('/', function(req, resp) {
 //   resp.render('index');
