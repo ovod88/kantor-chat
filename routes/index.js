@@ -6,9 +6,9 @@ module.exports = function(app) {
   
   app.get('/', require('./principale').get);
 
-  // app.get('/login', require('./login').get);
+  app.get('/login', require('./login').get);
 
-  // app.get('/chat', require('./chat').get);
+  app.get('/chat', require('./chat').get);
 
   // app.get('/users', function(req, resp, next) {
   //   User.find({}, function(err, users) {

@@ -34,8 +34,7 @@ app.use(cookieParser());//parse cookies into req.cookies object if there are any
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-// var MongoStore = require('connect-mongo')(session);
-
+var MongoStore = require('connect-mongo')(session);
 
 // app.use(session({
 //     "secret": config.get('session:secret'),
