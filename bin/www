@@ -32,8 +32,9 @@ server.on('error', onError);
 server.on('listening', onListening);
 
 var emit = server.emit;
+
 server.emit = function(event) {
-  console.log(event);
+  logger.info(event);
   emit.apply(server, arguments);
 }
 

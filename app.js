@@ -34,29 +34,31 @@ app.use(cookieParser());//parse cookies into req.cookies object if there are any
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-var MongoStore = require('connect-mongo')(session);
+// var MongoStore = require('connect-mongo')(session);
 
-app.use(session({
-  "secret": config.get('session:secret'),
-  "key": config.get('session:key'),
-  "cookie": {
-    "path": "/",
-    "httpOnly": true,
-    "maxAge": null
-  },
-  "store": new MongoStore({mongooseConnection: mongoose.connection})
-}));
 
-app.use(function(req, resp, next) {
-  req.session.visits = req.session.visits + 1 || 1;
-  resp.send('Number of visits: '+ req.session.visits );
-});
+// app.use(session({
+//     "secret": config.get('session:secret'),
+//     "key": config.get('session:key'),
+//     "cookie": {
+//       "path": "/",
+//       "httpOnly": true,
+//       "maxAge": null
+//     },
+//     "store": new MongoStore({mongooseConnection: mongoose.connection})
+// }));
+
+
+// app.use(function(req, resp, next) {
+//   req.session.visits = req.session.visits + 1 || 1;
+//   resp.send('Number of visits: '+ req.session.visits );
+// });
 
 app.use(require('middleware/sendHttpError'));
 
-app.get('/', function(req, resp) {
-  resp.render('index');
-});
+// app.get('/', function(req, resp) {
+//   resp.render('index');
+// });
 
 require("routes")(app);
 
