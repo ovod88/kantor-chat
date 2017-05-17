@@ -21,7 +21,7 @@ exports.post = function(req, resp, next) {
             }
         }
 
-        req.session.user = user._id; 
+        req.session.user = user._id;//here we save only id, because user object cabn very big to store it in DB
         resp.send({});
     })
 }

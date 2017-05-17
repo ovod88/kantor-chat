@@ -1,6 +1,7 @@
   // var User = require('db/models/user').User;
   var HttpError = require('errors').HttpError;
   var ObjectID = require('mongodb').ObjectID;
+  var checkAuth = require('middleware/checkAuth');
 
 module.exports = function(app) {
   
@@ -11,7 +12,7 @@ module.exports = function(app) {
   app.post('/login', require('./login').post);
   app.post('/logout', require('./logout').post);
 
-  app.get('/chat', require('./chat').get);
+  app.get('/chat', checkAuth, require('./chat').get);
 
   // app.get('/users', function(req, resp, next) {
   //   User.find({}, function(err, users) {
