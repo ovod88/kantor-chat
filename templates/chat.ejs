@@ -5,3 +5,12 @@
 
 <p><%= user.get('username')%></p>
 <p>Here we will have chat</p>
+
+<script src="/libs/bower_components/socket.io-client/dist/socket.io.js"></script>
+<script>
+  var socket = io();
+  socket.on('news', function (data) {
+    console.log(data);
+    socket.emit('my other event', { my: 'data2' });
+  });
+</script>

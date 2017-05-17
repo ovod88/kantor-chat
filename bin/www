@@ -97,3 +97,20 @@ function onListening() {
     : 'port ' + addr.port;
   logger.info('Listening on ' + bind);
 }
+
+var io = require('socket.io').listen(server, {
+    pingTimeout: 3000,
+    pingInterval: 1000
+  });// add socket to application to listen http messages
+
+io.on('connect', function (socket) {
+  socket.emit('news', { hello: 'world' });
+  socket.on('my other event', function (data) {
+    console.log(data);
+  });
+  
+  socket.on('ping', function (data) {
+    console.log(data);
+  });
+
+});
