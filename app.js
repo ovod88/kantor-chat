@@ -54,7 +54,7 @@ app.use(session({//this creates collection called sessions to store user session
 // });
 
 app.use(require('middleware/sendHttpError'));//creates method to send beautiful http error method
-
+app.use(require('middleware/loadUser'));
 // app.get('/', function(req, resp) {
 //   resp.render('index');
 // });

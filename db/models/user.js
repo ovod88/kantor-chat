@@ -1,5 +1,6 @@
 var crypto = require('crypto');
 var async = require('async');
+var util = require('util');
 var mongoose = require('../mongooseConnect'),
     Schema = mongoose.Schema;
 
@@ -71,7 +72,7 @@ exports.User = mongoose.model('User', schemaUser);
 
 function AuthError(message) {
     Error.apply(this, arguments);
-    Error.captureStackTrace(this, HttpError);
+    Error.captureStackTrace(this, AuthError);
 
     this.message = message;
 }
