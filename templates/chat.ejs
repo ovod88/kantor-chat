@@ -4,13 +4,34 @@
 <% block('footer', 'I am your footer') %>
 
 <p><%= user.get('username')%></p>
-<p>Here we will have chat</p>
+<div id="room">
+  <form>
+    <input class="form-control" autocomplete="off" autofocus placeholder="Message...">
+  </form>
+  <ul></ul>
+</div>
 
 <script src="/libs/bower_components/socket.io-client/dist/socket.io.js"></script>
 <script>
   var socket = io();
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data2' });
+
+  var $form = $('#room form');
+  var $ul = $('#room ul');
+
+  $form.submit(function() {
+    var input = $(this).find('input');
+    var text = input.val();
+
+    input.val('');
+
+    socket.emit('message', text, function() {
+      $('<li>', {text: text}).appendTo($ul);
+    });
+
+    return false;
+  });
+
+  socket.on('message', function (text) {
+    $('<li>', {text: text}).appendTo($ul);
   });
 </script>

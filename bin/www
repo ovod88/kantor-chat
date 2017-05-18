@@ -104,10 +104,10 @@ var io = require('socket.io').listen(server, {
   });// add socket to application to listen http messages
 
 io.on('connect', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+  socket.on("message", function(text, callback) {
+    socket.broadcast.emit("message", text);
+    callback();
+  })
   
   socket.on('ping', function (data) {
     console.log(data);
