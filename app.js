@@ -8,7 +8,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var config = require('config');
-var mongoose = require('db/mongooseConnect');
 var session = require('express-session');
 
 // var index = require('./routes/index');
@@ -33,8 +32,7 @@ app.use(bodyParser.urlencoded({ extended: false }));//parse header parameters (f
 app.use(cookieParser());//parse cookies into req.cookies object if there are any
 app.use(express.static(path.join(__dirname, 'public')));
 
-
-var MongoStore = require('connect-mongo')(session);
+var sessionStore = require('middleware/sessionStore');
 
 app.use(session({//this creates collection called sessions to store user session
     "secret": config.get('session:secret'),
@@ -44,7 +42,7 @@ app.use(session({//this creates collection called sessions to store user session
       "httpOnly": true,
       "maxAge": null
     },
-    "store": new MongoStore({mongooseConnection: mongoose.connection})
+    "store": sessionStore
 }));
 
 
