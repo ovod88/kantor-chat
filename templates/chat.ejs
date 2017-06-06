@@ -24,8 +24,14 @@
   var input = $form.find('input');
 
   socket
-        .on('message', function (message) {
-          printMessage(message);
+        .on('message', function (username, message) {
+          printMessage(username + " > " + message);
+        })
+        .on('join', function(username) {
+          printStatus(username + ' joined the chat');
+        })
+        .on('leave', function(username) {
+          printStatus(username + ' left the chat');
         })
         .on('connect', function() {
           printStatus('Connection established');
