@@ -45,7 +45,9 @@ module.exports = function(server) {
     var io = require('socket.io').listen(server);// add socket to application to listen http messages
     io.set('origins', 'localhost:*');//set which domains can access this socketio instance
 
-    io.set('authorization', function(handshake, callbackMain) {//handshake has access to request cookies
+    io.use(function(socket, next) {//handshake has access to request cookies
+        var handshake = socket.request;
+        
         async.waterfall([
             function(callback) {
                 handshake.cookies = cookie.parse(handshake.headers.cookie || '');
@@ -59,25 +61,27 @@ module.exports = function(server) {
                     callback(new HttpError(403, 'Anonymous user is not allowed'));
                 }
 
-                handshake.session = session;
+                socket.handshake.session = session;
                 loadUser(session, callback);
             },
             function(user, callback) {
                 if(!user) {
                     callback(new HttpError(403, 'Anonymous session is not allowed'));
                 }
-                handshake.user = user;
+                socket.handshake.user = user;
+
                 callback(null);
             }
         ], function(err) {
             if(!err) {
-                return callbackMain(null, true);//Chat is authorised
+                console.log('chat authorised');
+                return next();//Chat is authorised
             }
             if(err instanceof HttpError) {
-                return callbackMain(null, false);//Chat is not authorised
+                return next(err);//Chat is not authorised
             }
 
-            callbackMain(err);//give socket.io to process the error
+            next(err);//give socket.io to process the error
         });
     });
 
