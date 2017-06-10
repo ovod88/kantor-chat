@@ -38,10 +38,15 @@
           $form.on('submit', sendMessage);
           input.prop('disabled', false);
         })
+        .on('logout', function(error) {
+          printStatus('Connection closed due to logout event: ' + error);
+        })
         .on('disconnect', function() {
-          printStatus('Connection closed');
-          $form.off('submit', sendMessage);
-          input.prop('disabled', true);
+          setTimeout(function() {
+            printStatus('Connection closed');
+            $form.off('submit', sendMessage);
+            input.prop('disabled', true);
+          },  2000);
         })
         .on('reconnect_failed', function() {
           alert('Socket is closed completely');

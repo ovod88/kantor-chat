@@ -7,6 +7,8 @@ var sessionStore = require('middleware/sessionStore');//his object has access to
 var HttpError = require('errors').HttpError;
 var User = require('db/models/user').User;
 
+var EventEmitter = require("events").EventEmitter;
+var ee = new EventEmitter();
 
 function loadSession(sessionId, callback) {//Transform sessionStore load return values to async compatible view
     sessionStore.load(sessionId, function(err, session) {
@@ -19,8 +21,11 @@ function loadSession(sessionId, callback) {//Transform sessionStore load return 
 }
 
 function loadUser(session, callback) {
+    if(!session) {
+        return callback(null, null);
+    }
     if(!session.user) {
-        logger.debug('Sessios %s is anonymous', session.id);
+        logger.debug('Session %s is anonymous', session.id);
         return callback(null, null);
     }
 
@@ -58,7 +63,7 @@ module.exports = function(server) {
             },
             function(session, callback) {
                 if(!session) {
-                    callback(new HttpError(403, 'Anonymous user is not allowed'));
+                    return callback(new HttpError(403, 'Anonymous user is not allowed'));
                 }
 
                 socket.handshake.session = session;
@@ -66,7 +71,7 @@ module.exports = function(server) {
             },
             function(user, callback) {
                 if(!user) {
-                    callback(new HttpError(403, 'Anonymous session is not allowed'));
+                    return callback(new HttpError(403, 'Anonymous session is not allowed'));
                 }
                 socket.handshake.user = user;
 
@@ -85,6 +90,32 @@ module.exports = function(server) {
         });
     });
 
+    io.eeInternal = ee;
+
+    io.eeInternal.on('session:reload', function(sid) {
+        var clients = io.sockets.sockets;
+
+        Object.keys(clients).forEach(function(socketId) {
+            var client = io.sockets.sockets[socketId];
+            if(client.handshake.session.id != sid) return;
+
+             loadSession(sid, function(err, session) {
+                if(err) {
+                    client.emit('logout', 'server error');
+                    client.disconnect();
+                    return;
+                }
+                if(!session) {
+                    client.emit('logout', 'handshake anauthorised');
+                    client.disconnect();
+                    return;
+                }
+
+                client.handshake.session = session;
+            }) 
+        })
+    });
+
     io.on('connect', function (socket) {
         var username = socket.handshake.user.get('username');
 
@@ -93,7 +124,7 @@ module.exports = function(server) {
         socket.on("message", function(text, callback) {
             socket.broadcast.emit("message", username, text);
             callback();
-        })
+        });
         
         socket.on('ping', function (data) {
             logger.info(data);
@@ -103,4 +134,6 @@ module.exports = function(server) {
             socket.broadcast.emit('leave', username);
         })
     });
+
+    return io;
 }

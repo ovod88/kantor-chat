@@ -97,4 +97,6 @@ function onListening() {
   logger.info('Listening on ' + bind);
 }
 
-require('socket')(server);
+var io = require('socket')(server);
+
+app.set('io', io);//set global variable but only within application scope
